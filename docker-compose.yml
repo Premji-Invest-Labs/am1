@@ -1,0 +1,40 @@
+services:
+  am1_backend:
+    build: .
+    container_name: am1_backend
+    networks:
+      - am1_network
+    depends_on:
+      am1_postgres_db:
+        condition: service_healthy
+    restart: always
+    ports:
+      - "8000:8000"
+  am1_postgres_db:
+    image: postgres:17
+    container_name: am1_postgres_db
+    restart: always
+    networks:
+      - am1_network
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: user
+      POSTGRES_DB: am1
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./app/repository/db_setup.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:  # Add health check to ensure PostgreSQL is ready before FastAPI starts
+      test: ["CMD-SHELL", "pg_isready -U postgres -d am1"]
+      interval: 10s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  am1_network:
+    driver: bridge
