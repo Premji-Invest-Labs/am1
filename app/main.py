@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from app.api.v1.endpoints import health, task
 from app.core.logging import get_logger, logger_file_name
@@ -15,6 +16,15 @@ app = FastAPI(
     " Multi-Agent Framework and LLM, designed to run seamlessly on "
     "production servers or your local machine.",
     version="0.0.1",
+)
+
+# Cors Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include API routers
