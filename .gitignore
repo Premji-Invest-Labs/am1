@@ -172,3 +172,8 @@ cython_debug/
 logs/
 .venv/
 .DS_Store
+
+.env
+config/*.yaml
+config/*.yml
+alembic.ini

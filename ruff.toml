@@ -29,7 +29,7 @@ exclude = [
 ]
 
 # Same as Black.
-line-length = 88
+line-length = 100
 indent-width = 4
 
 # Assume Python 3.11
@@ -38,8 +38,9 @@ target-version = "py311"
 [lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
 #select = ["E4", "E7", "E9", "F"]
-select = ["E", "F", "FAST", "I", "N", "PL", "D", "DOC", "RET", "SIM", "TC", "UP", "TRY", "RUF"]
-ignore = []
+#select = ["E", "F", "FAST", "I", "N", "PL", "D",  "RET", "SIM", "TC", "UP", "TRY", "RUF"]
+select = ["E", "F", "FAST", "I",  "PL", "RET", "TC", "UP", "RUF"]
+ignore = ["TRY", "SIM", "FAST002"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]

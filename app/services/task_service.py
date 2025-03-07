@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import sessionmaker
+
 from app.core.enums import MultiAgentFrameworks
 from app.core.logging import get_logger, logger_file_name
 from app.maf.impl.magentic_one import MagenticOne
@@ -61,7 +62,7 @@ def create_task(task_request: TaskRequest, db: SyncSession):
 
     except SQLAlchemyError as db_err:
         # Rollback if there's an error
-        logger.error(f"Database error during task creation: {db_err}")
+        logger.exception(f"Database error during task creation: {db_err}")
         db.rollback()
         raise HTTPException(
             status_code=500, detail="Database error occurred during task creation"
@@ -69,7 +70,7 @@ def create_task(task_request: TaskRequest, db: SyncSession):
 
     except Exception as e:
         # Catch other errors
-        logger.error(f"Unexpected error creating task: {e}")
+        logger.exception(f"Unexpected error creating task: {e}")
         raise HTTPException(status_code=500, detail="Failed to create task")
 
 
@@ -119,7 +120,7 @@ async def start_task(task_id: str, db: SyncSession):
 
     except Exception as e:
         # General error handling (log it and return a generic error response)
-        logger.error(f"Error starting task with ID {task_id}: {e!s}")
+        logger.exception(f"Error starting task with ID {task_id}: {e!s}")
         raise HTTPException(status_code=500, detail="Failed to start task")
 
 
@@ -139,7 +140,7 @@ def get_task_details(task_id: str, db: SyncSession):
         return {
             "task": {
                 "id": task.task_id,
-                "query": task.query,  # Replace with actual attributes in your Task model
+                "query": task.query,
                 "status": task.status,
                 "multi_agent_framework": task.multi_agent_framework,
                 "llm_model": task.llm_model,
@@ -154,7 +155,7 @@ def get_task_details(task_id: str, db: SyncSession):
         }
 
     except Exception as e:
-        logger.error(f"Error fetching task with ID {task_id}: {e!s}")
+        logger.exception(f"Error fetching task with ID {task_id}: {e!s}")
         return {"error": "Failed to fetch task", "message": str(e)}
 
 
@@ -190,7 +191,7 @@ def get_all_tasks(offset: int, limit: int, db: SyncSession):
         }
 
     except Exception as e:
-        logger.error(f"Error fetching tasks: {e!s}")
+        logger.exception(f"Error fetching tasks: {e!s}")
         return {"error": "Failed to fetch tasks", "message": str(e)}
 
 
@@ -246,5 +247,5 @@ def update_task_details(
 
     except Exception as e:
         # Step 6: Error handling - Capture the exception and log it.
-        logger.error(f"Error updating task with ID {task_id}: {e!s}")
+        logger.exception(f"Error updating task with ID {task_id}: {e!s}")
         return {"error": "Failed to update task", "message": str(e)}

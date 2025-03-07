@@ -11,7 +11,8 @@ logger.debug(f"Current env: {settings.ENV}")
 # FastAPI app instance
 app = FastAPI(
     title=settings.APP_NAME,
-    description="AM1 API for doing general complex tasks using computer with a small team of GenAI Agents.",
+    description="AM1 API for doing general complex tasks using "
+    "computer with a small team of GenAI Agents.",
     version="0.0.1",
 )
 

@@ -144,8 +144,6 @@ class MagenticOne(MultiAgentFramework):
 
     async def _execute(self, content: str, runtime):
         self.logger.info("Executing orchestration.")
-        # Replaced BroadcastMessage with ChatMessage
-        # message = ChatMessage(content=content, sender="user", recipient="file_surfer_agent", timestamp=dt.now())
         message = BroadcastMessage(
             content=UserMessage(content=content, source="user"), request_halt=False
         )
