@@ -41,7 +41,7 @@ RUN uv pip install --system playwright
 RUN playwright install
 
 # Install custom libraries
-COPY *.whl ./
+COPY  custom-packages/*.whl ./
 # Install custom dependencies
 #RUN uv pip install /app/autogen_core-0.4.2-py3-none-any.whl /app/autogen_ext-0.4.2-py3-none-any.whl /app/autogen_magentic_one-0.0.1-py3-none-any.whl
 RUN uv pip install --system autogen_core-0.4.2-py3-none-any.whl autogen_ext-0.4.2-py3-none-any.whl autogen_magentic_one-0.0.1-py3-none-any.whl
