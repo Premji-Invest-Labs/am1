@@ -128,8 +128,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
-.env.*
+#../.env
 .venv
 env/
 venv/
@@ -172,10 +171,10 @@ cython_debug/
 .pypirc
 logs/
 .venv/
+*.pyc
+*.pyo
+*.pyd
+__pycache__
 .DS_Store
-myenv
-certs/
-.certs/
-config/*.yaml
-config/*.yml
-
+node_modules/
+.cea_ag2/
