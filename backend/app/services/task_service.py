@@ -7,6 +7,7 @@ from sqlalchemy.future import select
 
 from app.core.enums import MultiAgentFrameworks, TaskStatus
 from app.core.logging import get_logger
+from app.main import producer, KAFKA_TOPIC
 from app.models.task import Task
 from app.repository.task_repository import TaskRepository
 from app.schemas.task import (
@@ -136,6 +137,7 @@ async def start_task(task_id: str, background_tasks: BackgroundTasks, db: AsyncS
         logger.info(f"Task with ID {task_id} found: {task}")
 
         background_tasks.add_task(execute_task, task, db)
+        await producer.send_job(job, KAFKA_TOPIC)
         # update_task_details(
         #     task_id=task_id, final_response=response, status=status, db=db
         # )
