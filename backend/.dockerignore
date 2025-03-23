@@ -176,4 +176,3 @@ logs/
 *.pyd
 __pycache__
 .DS_Store
-.cea_ag2/

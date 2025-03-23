@@ -177,4 +177,3 @@ logs/
 __pycache__
 .DS_Store
 node_modules/
-.cea_ag2/
