@@ -1,0 +1,112 @@
+@import 'tailwindcss';
+
+:root {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #fff;
+}
+
+body {
+    min-height: 100vh;
+    background-color: #fff;
+}
+/* WebKit (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+    width: 6px; /* Thin scrollbar */
+    height: 6px; /* Horizontal scrollbar */
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent; /* Transparent track */
+}
+
+*::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2); /* Light semi-transparent thumb */
+    border-radius: 10px; /* Rounded corners */
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.4); /* Darker thumb on hover */
+}
+
+/* Remove the up/down arrows */
+*::-webkit-scrollbar-button {
+    display: none; /* Hide the up and down arrows */
+}
+
+.dot-animation::after {
+    content: '.';
+    animation: dots 1.5s infinite steps(1, end);
+}
+
+.dot-animation::after {
+    content: '..';
+    animation: dots 1.5s infinite steps(2, end);
+}
+
+.dot-animation::after {
+    content: '...';
+    animation: dots 1.5s infinite steps(3, end);
+}
+
+@keyframes dots {
+    0% {
+        content: '.';
+    }
+    33% {
+        content: '..';
+    }
+    66% {
+        content: '...';
+    }
+    100% {
+        content: '.';
+    }
+}
+
+.emoji-animation::after {
+    content: '🤖';
+    animation: emojiSequence 4s infinite steps(1, end);
+}
+
+.emoji-animation::after {
+    content: '🤖💭';
+    animation: emojiSequence 4s infinite steps(2, end);
+}
+
+.emoji-animation::after {
+    content: '🤖💭🧠';
+    animation: emojiSequence 4s infinite steps(3, end);
+}
+
+.emoji-animation::after {
+    content: '🤖💭🧠📝';
+    animation: emojiSequence 4s infinite steps(4, end);
+}
+
+.emoji-animation::after {
+    content: '🤖💭🧠📝⌛';
+    animation: emojiSequence 4s infinite steps(5, end);
+}
+
+@keyframes emojiSequence {
+    0% {
+        content: '🤖';
+    }
+    20% {
+        content: '🤖💭';
+    }
+    40% {
+        content: '🤖💭🧠';
+    }
+    60% {
+        content: '🤖💭🧠📝';
+    }
+    80% {
+        content: '🤖💭🧠📝⌛';
+    }
+    100% {
+        content: '🤖💭🧠📝⌛';
+    }
+}

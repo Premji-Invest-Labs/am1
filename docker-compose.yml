@@ -1,31 +1,80 @@
 services:
-  am1_backend:
-    build: .
+  # Backend service
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: am1_backend
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/config:/app/config
+      - ./backend/tests:/app/tests
+#      - ./.certs:/etc/ssl/certs
+      - ./.certs/server.crt:/etc/ssl/certs/pi-localhost.crt
+      - ./.certs/server.key:/etc/ssl/certs/pi-localhost.key
     networks:
       - am1_network
     depends_on:
-      am1_postgres_db:
+      postgres:
         condition: service_healthy
     restart: always
     ports:
       - "8000:8000"
-  am1_postgres_db:
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:user@am1_postgres_db:5432/am1
+      - DEBUG=True
+      - ENVIRONMENT=development
+#      - SSL_CERT_FILE=/etc/ssl/certs/pi-localhost.crt
+#      - SSL_KEY_FILE=/etc/ssl/certs/pi-localhost.key
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  # Frontend service
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: am1_frontend
+    volumes:
+      - ./frontend/src:/app/src  # Only mount source code for hot reloading
+      - ./frontend/public:/app/public
+#      - ./.certs:/etc/ssl/certs
+      - ./.certs/server.crt:/etc/ssl/certs/pi-localhost.crt
+      - ./.certs/server.key:/etc/ssl/certs/pi-localhost.key
+    networks:
+      - am1_network
+    ports:
+      - "3000:3000"
+    environment:
+      #- VITE_API_URL=http://backend:8000
+      - VITE_API_URL=https://backend:8000
+      - NODE_ENV=development
+      - VITE_DEV_SERVER_USE_HTTPS=true
+      - NODE_EXTRA_CA_CERTS=/etc/ssl/certs/pi-localhost.crt
+    depends_on:
+      - backend
+
+  # Database service
+  postgres:
     image: postgres:17
     container_name: am1_postgres_db
     restart: always
     networks:
       - am1_network
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: user
+      POSTGRES_DB: am1
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./app/repository/db_setup.sql:/docker-entrypoint-initdb.d/init.sql
-    healthcheck:  # Add health check to ensure PostgreSQL is ready before FastAPI starts
+      - ./backend/app/db/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d am1"]
       interval: 10s
       retries: 5
@@ -33,7 +82,6 @@ services:
 
 volumes:
   postgres_data:
-    driver: local
 
 networks:
   am1_network:
