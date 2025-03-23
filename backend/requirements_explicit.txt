@@ -90,3 +90,4 @@ xlrd==2.0.1
 xlsxwriter==3.2.2
 youtube-transcript-api==1.0.2
 zipp==3.21.0
+aiokafka==0.10.0

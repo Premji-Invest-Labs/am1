@@ -15,6 +15,8 @@ services:
     networks:
       - am1_network
     depends_on:
+      kafka:
+        condition: service_healthy
       postgres:
         condition: service_healthy
     restart: always
@@ -24,6 +26,7 @@ services:
       - DATABASE_URL=postgresql+asyncpg://postgres:user@am1_postgres_db:5432/am1
       - DEBUG=True
       - ENVIRONMENT=development
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
 #      - SSL_CERT_FILE=/etc/ssl/certs/pi-localhost.crt
 #      - SSL_KEY_FILE=/etc/ssl/certs/pi-localhost.key
     healthcheck:
@@ -80,16 +83,16 @@ services:
       retries: 5
       start_period: 20s
   zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.3.0
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - am1_network
+    ports:
+      - "2181:2181"
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.3.0
     container_name: kafka
     depends_on:
       - zookeeper
@@ -98,26 +101,27 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_NUM_PARTITIONS: 3
     networks:
       - am1_network
 
-  rest-proxy:
-    image: confluentinc/cp-kafka-rest:latest
-    container_name: kafka-rest-proxy
-    depends_on:
-      - kafka
-    ports:
-      - "8082:8082"
-    environment:
-      KAFKA_REST_HOST_NAME: rest-proxy
-      KAFKA_REST_BOOTSTRAP_SERVERS: "kafka:9092"
-      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
-    networks:
-      - am1_network
+#  rest-proxy:
+#    image: confluentinc/cp-kafka-rest:latest
+#    container_name: kafka-rest-proxy
+#    depends_on:
+#      - kafka
+#    ports:
+#      - "8082:8082"
+#    environment:
+#      KAFKA_REST_HOST_NAME: rest-proxy
+#      KAFKA_REST_BOOTSTRAP_SERVERS: "kafka:9092"
+#      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
+#    networks:
+#      - am1_network
 
 volumes:
   postgres_data:
