@@ -1,11 +1,12 @@
 # AM1
-`Ajna MultiAgent One` platform to get things done for you from surfing web and taking actions, collecting data, reading and analysing files, planning, coding, research, and
+`Ajna Manav - One` platform to get things done for you from surfing web and taking actions, collecting data, reading and analysing files, planning, coding, research, and
 more... to reach the goal given by user.
 
 Let agents do the grunt work for you, while you focus on the big picture.
 
-## Demo Video
-Demo video will be released on 11th March 2025 along with UI Release.
+[//]: # (## Demo Video)
+
+[//]: # (Demo video will be released on 11th March 2025 along with UI Release.)
 
 ## Setup
 Execute the following commands to setup the project:
