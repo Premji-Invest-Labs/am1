@@ -1,14 +1,20 @@
 import json
 import os
 import time
-from typing import Dict, Any
+from typing import Any
 
 import requests
 
-from app.core.enums import TaskStatus, MultiAgentFrameworks
+from app.core.enums import TaskStatus
 from app.core.logging import get_logger
 from app.repository.task_repository import TaskRepository
-from app.schemas.task import AgenticTaskRequest, TaskResponse, TaskRequest, TaskOutput, LiveStreamResponse
+from app.schemas.task import (
+    AgenticTaskRequest,
+    LiveStreamResponse,
+    TaskOutput,
+    TaskRequest,
+    TaskResponse,
+)
 from app.services.maf.maf import MultiAgentFramework
 
 
@@ -39,7 +45,7 @@ class AM1(MultiAgentFramework):
         await self.task_repository.update(task_id, {
             "task_metadata": task.task_metadata.update({"browser_task_id": browser_task_id})
         })
-        browser_use_task_response: Dict = browser_use.get_task_details(browser_task_id)
+        browser_use_task_response: dict = browser_use.get_task_details(browser_task_id)
         # yield str(task_response)
         self.logger.info(f"Task response: {browser_use_task_response}")
         if not task.task_metadata:
@@ -101,7 +107,7 @@ class BrowserUse:
         response = requests.get(f'{self.BASE_URL}/task/{task_id}/status', headers=self.HEADERS)
         return response.json()
 
-    def get_task_details(self, task_id: str) -> Dict[str, Any]:
+    def get_task_details(self, task_id: str) -> dict[str, Any]:
         """Get full task details including output"""
         response = requests.get(f'{self.BASE_URL}/task/{task_id}', headers=self.HEADERS)
         return response.json()

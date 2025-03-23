@@ -1,9 +1,11 @@
-from fastapi import Depends
+
 from database import Database
+from fastapi import Depends
 from repository import TaskRepository
 from service import TaskService
-from typing import Callable, Iterator
+
 from config import settings
+
 
 def get_database() -> Database:
     """Get database instance"""

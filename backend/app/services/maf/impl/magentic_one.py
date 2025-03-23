@@ -184,7 +184,7 @@ class MagenticOne(MultiAgentFramework):
                 # os.environ["OPENAI_API_KEY"] = (
                 #     ""
                 # )
-                self.logger.info(f"Using OpenAI API key in environment")
+                self.logger.info("Using OpenAI API key in environment")
                 client = create_completion_client_from_env(model="gpt-4o")
             # elif llm_model in LLAMA_LLM_MODELS:
             elif llm_model.lower().__contains__("llama3"):

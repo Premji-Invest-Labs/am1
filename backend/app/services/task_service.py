@@ -1,8 +1,6 @@
 import os
-from typing import Dict, Type
 
-from fastapi import BackgroundTasks
-from fastapi import HTTPException, UploadFile
+from fastapi import BackgroundTasks, HTTPException, UploadFile
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -11,7 +9,14 @@ from app.core.enums import MultiAgentFrameworks, TaskStatus
 from app.core.logging import get_logger
 from app.models.task import Task
 from app.repository.task_repository import TaskRepository
-from app.schemas.task import AgenticTaskRequest, TaskRequest, TaskResponse, LLMFileInput, TaskOutput, LiveStreamResponse
+from app.schemas.task import (
+    AgenticTaskRequest,
+    LiveStreamResponse,
+    LLMFileInput,
+    TaskOutput,
+    TaskRequest,
+    TaskResponse,
+)
 from app.services.maf.impl.am1 import BrowserUse
 
 logger = get_logger()
@@ -37,76 +42,75 @@ async def create_task(task_request: TaskRequest, db: AsyncSession) -> TaskRespon
         task_response = await update_task(task_request.task_id, update_data)
         logger.info(f"Task {task_request.task_id} updated")
         return task_response
-    else:
-        try:
-            # Ensure query is provided
-            if not task_request.query:
-                raise HTTPException(status_code=400, detail="Query is required")
+    try:
+        # Ensure query is provided
+        if not task_request.query:
+            raise HTTPException(status_code=400, detail="Query is required")
 
-            # Get the multi-agent framework and LLM model
-            multi_agent_framework = task_request.multi_agent_framework
-            llm_model = (
-                task_request.llm_model if task_request.llm_model else "openai-gpt-4o-mini"
+        # Get the multi-agent framework and LLM model
+        multi_agent_framework = task_request.multi_agent_framework
+        llm_model = (
+            task_request.llm_model if task_request.llm_model else "openai-gpt-4o-mini"
+        )
+
+        # Validate multi-agent framework
+        if multi_agent_framework not in [
+            maf_name.value for maf_name in MultiAgentFrameworks.__members__.values()
+        ]:
+            logger.error(
+                "Received invalid multi-agent framework: %s", multi_agent_framework
             )
-
-            # Validate multi-agent framework
-            if multi_agent_framework not in [
-                maf_name.value for maf_name in MultiAgentFrameworks.__members__.values()
-            ]:
-                logger.error(
-                    "Received invalid multi-agent framework: %s", multi_agent_framework
-                )
-                raise HTTPException(
-                    status_code=400, detail="Invalid multi-agent framework provided"
-                )
-
-            # Create the task instance
-            task = Task(
-                query=task_request.query,
-                multi_agent_framework=multi_agent_framework,
-                llm_model=llm_model,
-                enable_internet=task_request.enable_internet,
-                status=TaskStatus.CREATED.value,
-                task_metadata={}
-            )
-            created_task = await task_repository.create(task)
-
-            # async with db.acquire() as conn:
-            #     async with conn.transaction():
-            #         task = await conn.fetchrow(
-            #             """INSERT INTO tasks (query, multi_agent_framework, llm_model, enable_internet)
-            #                VALUES ($1, $2, $3, $4) RETURNING task_id""",
-            #             task_request.query, multi_agent_framework, llm_model, task_request.enable_internet
-            #         )
-            task_response = TaskResponse(
-                task_id=str(created_task.task_id),
-                status=created_task.status,
-                task_request=TaskRequest(
-                    query=task_request.query,
-                    multi_agent_framework=task_request.multi_agent_framework,
-                    llm_model=task_request.llm_model,
-                    enable_internet=task_request.enable_internet,
-                ),
-                input_file_names=created_task.input_file_names,
-                task_metadata=created_task.task_metadata,
-                created_at=created_task.created_at.isoformat() if created_task.created_at else None,
-                updated_at=created_task.updated_at.isoformat() if created_task.updated_at else None,
-            )
-            logger.info(f"Created task {task_response.task_id}")
-            return task_response
-
-        except SQLAlchemyError as db_err:
-            # Rollback if there's an error
-            logger.error(f"Database error during task creation: {db_err}")
-            # db.rollback()
             raise HTTPException(
-                status_code=500, detail="Database error occurred during task creation"
+                status_code=400, detail="Invalid multi-agent framework provided"
             )
 
-        except Exception as e:
-            # Catch other errors
-            logger.exception(f"Unexpected error creating task: {e}")
-            raise HTTPException(status_code=500, detail="Failed to create task")
+        # Create the task instance
+        task = Task(
+            query=task_request.query,
+            multi_agent_framework=multi_agent_framework,
+            llm_model=llm_model,
+            enable_internet=task_request.enable_internet,
+            status=TaskStatus.CREATED.value,
+            task_metadata={}
+        )
+        created_task = await task_repository.create(task)
+
+        # async with db.acquire() as conn:
+        #     async with conn.transaction():
+        #         task = await conn.fetchrow(
+        #             """INSERT INTO tasks (query, multi_agent_framework, llm_model, enable_internet)
+        #                VALUES ($1, $2, $3, $4) RETURNING task_id""",
+        #             task_request.query, multi_agent_framework, llm_model, task_request.enable_internet
+        #         )
+        task_response = TaskResponse(
+            task_id=str(created_task.task_id),
+            status=created_task.status,
+            task_request=TaskRequest(
+                query=task_request.query,
+                multi_agent_framework=task_request.multi_agent_framework,
+                llm_model=task_request.llm_model,
+                enable_internet=task_request.enable_internet,
+            ),
+            input_file_names=created_task.input_file_names,
+            task_metadata=created_task.task_metadata,
+            created_at=created_task.created_at.isoformat() if created_task.created_at else None,
+            updated_at=created_task.updated_at.isoformat() if created_task.updated_at else None,
+        )
+        logger.info(f"Created task {task_response.task_id}")
+        return task_response
+
+    except SQLAlchemyError as db_err:
+        # Rollback if there's an error
+        logger.error(f"Database error during task creation: {db_err}")
+        # db.rollback()
+        raise HTTPException(
+            status_code=500, detail="Database error occurred during task creation"
+        )
+
+    except Exception as e:
+        # Catch other errors
+        logger.exception(f"Unexpected error creating task: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create task")
 
 
 async def start_task(task_id: str, background_tasks: BackgroundTasks, db: AsyncSession) -> TaskResponse:
@@ -237,7 +241,7 @@ async def get_task_details(task_id: str) -> TaskResponse:
     """Retrieve a task by its ID asynchronously."""
     try:
         # Retrieve the task by ID
-        task: Type[Task] | None = await task_repository.get(task_id)
+        task: type[Task] | None = await task_repository.get(task_id)
 
         if task is None:
             logger.warning(f"Task with ID {task_id} not found.")
@@ -462,7 +466,7 @@ async def get_all_tasks(offset: int, limit: int, db: AsyncSession) -> list[TaskR
 #         raise HTTPException(status_code=500, detail="Failed to update task")
 
 
-async def update_task(task_id: str, update_data: Dict):
+async def update_task(task_id: str, update_data: dict):
     updated_task = await task_repository.update(task_id=task_id, update_data=update_data)
     task_response = TaskResponse(
         task_id=str(updated_task.task_id),

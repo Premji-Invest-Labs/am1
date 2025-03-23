@@ -7,7 +7,6 @@ from logging.handlers import RotatingFileHandler
 from app.core.settings import settings
 
 
-
 # Singleton Logger Function
 @lru_cache(maxsize=1)
 def get_logger():
