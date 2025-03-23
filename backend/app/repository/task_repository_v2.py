@@ -1,13 +1,14 @@
-from typing import List, Optional, Dict, Any
-import asyncpg
 from datetime import datetime
-from models import Task, TaskCreate
+from typing import Any
+
+from models import TaskCreate
+
 
 class TaskRepository:
     def __init__(self, database):
         self.db = database
 
-    async def get_all_tasks(self) -> List[Dict[str, Any]]:
+    async def get_all_tasks(self) -> list[dict[str, Any]]:
         """Fetch all tasks from the database"""
         async with self.db.connection() as conn:
             rows = await conn.fetch(
@@ -19,7 +20,7 @@ class TaskRepository:
             )
             return [dict(row) for row in rows]
 
-    async def get_task_by_id(self, task_id: int) -> Optional[Dict[str, Any]]:
+    async def get_task_by_id(self, task_id: int) -> dict[str, Any] | None:
         """Fetch a task by its ID"""
         async with self.db.connection() as conn:
             row = await conn.fetchrow(
@@ -32,7 +33,7 @@ class TaskRepository:
             )
             return dict(row) if row else None
 
-    async def create_task(self, task: TaskCreate) -> Dict[str, Any]:
+    async def create_task(self, task: TaskCreate) -> dict[str, Any]:
         """Create a new task"""
         async with self.db.connection() as conn:
             row = await conn.fetchrow(
@@ -48,11 +49,11 @@ class TaskRepository:
             )
             return dict(row)
 
-    async def update_task(self, task_id: int, task_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def update_task(self, task_id: int, task_data: dict[str, Any]) -> dict[str, Any] | None:
         """Update an existing task"""
         # Build the dynamic update query
-        set_values: List[str] = []
-        params: List[Any] = []
+        set_values: list[str] = []
+        params: list[Any] = []
         param_index: int = 1
 
         for key, value in task_data.items():

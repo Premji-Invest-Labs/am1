@@ -1,9 +1,11 @@
+import logging
+
 import uvicorn
 from fastapi import FastAPI
+
 from app.api import router as tasks_router
-from app.database import Database
 from app.config import settings
-import logging
+from app.database import Database
 
 # Configure logging
 logging.basicConfig(

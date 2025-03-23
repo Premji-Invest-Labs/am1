@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import taskStore from '../../store';
+import { useParams } from 'react-router-dom';
 import TaskDetailView from './TaskDetail.view';
 import { Button, Spin } from 'antd';
 import { getTask, startTask } from '../../apiClient';

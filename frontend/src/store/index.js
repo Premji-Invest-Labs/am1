@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import axios from 'axios';
 import { getAllTasks } from '../apiClient';
 
 const taskStore = create((set, get) => ({

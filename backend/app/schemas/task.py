@@ -1,79 +1,78 @@
 from datetime import datetime
-from typing import Optional, List, Dict
 
 from pydantic import BaseModel, HttpUrl
 
 from app.core.enums import MultiAgentFrameworks
-from app.models.llm import LLMModel, get_default_model
+from app.models.llm import get_default_model
 
 
 class TaskRequest(BaseModel):
-    task_id: Optional[str] = None
-    query: Optional[str] = None
-    multi_agent_framework: Optional[str] = MultiAgentFrameworks.AM1.value
-    llm_model: Optional[str] = get_default_model().id
-    enable_internet: Optional[bool] = True
+    task_id: str | None = None
+    query: str | None = None
+    multi_agent_framework: str | None = MultiAgentFrameworks.AM1.value
+    llm_model: str | None = get_default_model().id
+    enable_internet: bool | None = True
 
 
 class LiveStreamResponse(BaseModel):
-    web_surfer_url: Optional[HttpUrl] = None
-    file_surfer_url: Optional[HttpUrl] = None
-    coder_url: Optional[HttpUrl] = None
-    executor_url: Optional[HttpUrl] = None
-    video_surfer_url: Optional[HttpUrl] = None
-    mas_stream_url: Optional[HttpUrl] = None
-    agent_conversations: Optional[Dict] = None
+    web_surfer_url: HttpUrl | None = None
+    file_surfer_url: HttpUrl | None = None
+    coder_url: HttpUrl | None = None
+    executor_url: HttpUrl | None = None
+    video_surfer_url: HttpUrl | None = None
+    mas_stream_url: HttpUrl | None = None
+    agent_conversations: dict | None = None
 
 class TaskOutput(BaseModel):
-    final_response: Optional[str] = None
-    output_file_urls: Optional[Dict] = None
+    final_response: str | None = None
+    output_file_urls: dict | None = None
 
 
 class TaskResponse(BaseModel):
     task_id: str
-    status: Optional[str] = None
+    status: str | None = None
     task_request: TaskRequest
-    input_file_names: List[str] = []
-    task_output: Optional[TaskOutput] = None
-    live_stream_response: Optional[LiveStreamResponse] = None
-    task_metadata: Optional[Dict] = None
-    created_at: Optional[datetime] = None
-    updated_at: Optional[datetime] = None
+    input_file_names: list[str] = []
+    task_output: TaskOutput | None = None
+    live_stream_response: LiveStreamResponse | None = None
+    task_metadata: dict | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
 
 class ChatRequest(BaseModel):
     query: str
-    file_hashes: List[str]
+    file_hashes: list[str]
     conversation_session_id: str
     compare: bool = False
     stream: bool = False
-    enable_internet: Optional[bool] = None
-    enable_cot: Optional[bool] = True
-    use_chat_history: Optional[bool] = True
-    all_chunks_in_context: Optional[bool] = None
+    enable_internet: bool | None = None
+    enable_cot: bool | None = True
+    use_chat_history: bool | None = True
+    all_chunks_in_context: bool | None = None
 
 
 class ChatResponse(BaseModel):
     conversation_session_id: str
-    chat_responses: List[Dict]
-    metadata: Dict
+    chat_responses: list[dict]
+    metadata: dict
 
 
 class LLMFileInput(BaseModel):
-    file_hash: Optional[str] = None
-    file_name: Optional[str] = None
-    file_extension: Optional[str] = None
-    file_size: Optional[int] = None
-    file_local_path: Optional[str] = None
-    file_cloud_url: Optional[str] = None
+    file_hash: str | None = None
+    file_name: str | None = None
+    file_extension: str | None = None
+    file_size: int | None = None
+    file_local_path: str | None = None
+    file_cloud_url: str | None = None
 
 
 class AgenticTaskRequest(BaseModel):
-    task_id: Optional[str] = None
+    task_id: str | None = None
     query: str
     llm_model: str = get_default_model().id
     enable_internet: bool = True
-    files: Optional[List[LLMFileInput]] = None
-    conversation_session_id: Optional[str] = None
-    dialogue_id: Optional[str] = None
-    stream: Optional[bool] = False
-    metadata: Optional[Dict] = None
+    files: list[LLMFileInput] | None = None
+    conversation_session_id: str | None = None
+    dialogue_id: str | None = None
+    stream: bool | None = False
+    metadata: dict | None = None
