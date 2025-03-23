@@ -1,0 +1,10 @@
+app:
+  name: "AM1 Backend (Local)"
+  debug: true
+
+database:
+  url: "your-db-url"
+
+llm_providers:
+  openai:
+    api_key: "your-openai-key"
