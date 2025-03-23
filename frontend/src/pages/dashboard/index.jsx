@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import DashboardView from './Dashboard.view';
 import { useNavigate } from 'react-router-dom';
 import { PATH_NAMES } from '../../constants';

@@ -1,6 +1,5 @@
 import React, {
     useCallback,
-    useEffect,
     useMemo,
     useRef,
     useState,
@@ -64,7 +63,6 @@ const AllTasksController = ({ collapsed }) => {
 
     const defaultColDef = useMemo(
         () => ({
-            resizable: false,
             movable: true,
             lockVisible: true,
             sortable: true,

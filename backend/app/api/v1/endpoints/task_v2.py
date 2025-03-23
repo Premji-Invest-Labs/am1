@@ -1,17 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List, Dict, Any
+from typing import Any
+
+from dependencies import get_task_service
+from fastapi import APIRouter, Depends
 from models import Task, TaskCreate
 from service import TaskService
-from repository import TaskRepository
-from database import Database
-from dependencies import get_task_service
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
-@router.get("/", response_model=List[Task])
+@router.get("/", response_model=list[Task])
 async def get_tasks(
     task_service: TaskService = Depends(get_task_service)
-) -> List[Task]:
+) -> list[Task]:
     """Get all tasks"""
     return await task_service.get_all_tasks()
 
@@ -34,7 +33,7 @@ async def create_task(
 @router.put("/{task_id}", response_model=Task)
 async def update_task(
     task_id: int,
-    task_data: Dict[str, Any],
+    task_data: dict[str, Any],
     task_service: TaskService = Depends(get_task_service)
 ) -> Task:
     """Update an existing task"""
@@ -44,6 +43,6 @@ async def update_task(
 async def delete_task(
     task_id: int,
     task_service: TaskService = Depends(get_task_service)
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """Delete a task"""
     return await task_service.delete_task(task_id)

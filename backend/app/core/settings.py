@@ -1,6 +1,6 @@
 import os
 from datetime import datetime as dt
-from typing import ClassVar, Optional
+from typing import ClassVar
 
 import yaml
 from dotenv import load_dotenv
@@ -48,13 +48,13 @@ class Settings(BaseSettings):
         config_data.get("llm_providers", {}).get("openai", {}).get("api_key", "no-key"),
     )
 
-    CHAT_COMPLETION_PROVIDER: Optional[str] = os.getenv("CHAT_COMPLETION_PROVIDER", None)
-    AZURE_OPENAI_API_KEY: Optional[str] = os.getenv("AZURE_OPENAI_API_KEY", None)
-    AZURE_OPENAI_ENDPOINT: Optional[str] = os.getenv("AZURE_OPENAI_ENDPOINT", None)
-    OPENAI_API_VERSION: Optional[str] = os.getenv("OPENAI_API_VERSION", None)
-    AZURE_CLIENT_ID: Optional[str] = os.getenv("AZURE_CLIENT_ID", None)
-    AZURE_TENANT_ID: Optional[str] = os.getenv("AZURE_TENANT_ID", None)
-    AZURE_CLIENT_SECRET: Optional[str] = os.getenv("AZURE_CLIENT_SECRET", None)
+    CHAT_COMPLETION_PROVIDER: str | None = os.getenv("CHAT_COMPLETION_PROVIDER", None)
+    AZURE_OPENAI_API_KEY: str | None = os.getenv("AZURE_OPENAI_API_KEY", None)
+    AZURE_OPENAI_ENDPOINT: str | None = os.getenv("AZURE_OPENAI_ENDPOINT", None)
+    OPENAI_API_VERSION: str | None = os.getenv("OPENAI_API_VERSION", None)
+    AZURE_CLIENT_ID: str | None = os.getenv("AZURE_CLIENT_ID", None)
+    AZURE_TENANT_ID: str | None = os.getenv("AZURE_TENANT_ID", None)
+    AZURE_CLIENT_SECRET: str | None = os.getenv("AZURE_CLIENT_SECRET", None)
 
     LOGS_DIR: str = os.getenv(
         "LOGS_DIR", config_data.get("logs", {}).get("logs_dir", "logs")

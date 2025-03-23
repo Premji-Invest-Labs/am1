@@ -1,6 +1,6 @@
-from typing import List, Optional, Dict, Any
 from dataclasses import dataclass
 from enum import Enum, auto
+from typing import Any
 
 from app.core.logging import get_logger
 
@@ -8,6 +8,7 @@ logger = get_logger()
 
 class LLMProvider(Enum):
     """Companies providing LLM services"""
+
     OPENAI = "openai"
     AZURE = "azure"
     GOOGLE = "google"
@@ -19,6 +20,7 @@ class LLMProvider(Enum):
 
 class LLMFamily(Enum):
     """Major model families"""
+
     GPT = "gpt"
     GEMINI = "gemini"
     LLAMA = "llama"
@@ -28,6 +30,7 @@ class LLMFamily(Enum):
 
 class InputCapability(Enum):
     """Types of inputs the model can understand"""
+
     TEXT = auto()
     IMAGE = auto()
     AUDIO = auto()
@@ -40,6 +43,7 @@ class InputCapability(Enum):
 
 class OutputCapability(Enum):
     """Types of outputs the model can generate"""
+
     TEXT = auto()
     IMAGE = auto()
     AUDIO = auto()
@@ -51,6 +55,7 @@ class OutputCapability(Enum):
 
 class ModelCapability(Enum):
     """Special capabilities a model may have"""
+
     FUNCTION_CALLING = auto()
     VISION = auto()
     TOOL_USE = auto()
@@ -68,6 +73,7 @@ class ModelCapability(Enum):
 
 class Tool(Enum):
     """Tools that the model can use"""
+
     WEB_SEARCH = auto()
     WEB_BROWSING = auto()
     CODE_INTERPRETER = auto()
@@ -85,6 +91,7 @@ class Tool(Enum):
 
 class HostedCloud(Enum):
     """Hosted cloud for the model"""
+
     AZURE = auto()
     GCP = auto()
     AWS = auto()
@@ -94,6 +101,7 @@ class HostedCloud(Enum):
 
 class ModelRegion(Enum):
     """Region where the model is hosted"""
+
     US = auto()
     EU = auto()
     ASIA = auto()
@@ -101,6 +109,7 @@ class ModelRegion(Enum):
 
 class ModelCity(Enum):
     """City where the model is hosted"""
+
     SEATTLE = auto()
     SAN_FRANCISCO = auto()
     CHENNAI = auto()
@@ -117,43 +126,44 @@ class ModelCity(Enum):
 @dataclass
 class LLMModel:
     """Comprehensive model representation"""
+
     display_name: str  # Human-readable name
     provider: LLMProvider  # Provider company
     family: LLMFamily  # Model family
-    input_capabilities: List[InputCapability] = None  # What inputs it can process
-    output_capabilities: List[OutputCapability] = None  # What outputs it can generate
-    capabilities: List[ModelCapability] = None  # Special capabilities
-    parameters: Optional[str] = None  # E.g., "7b", "70b"
-    version: Optional[str] = None  # E.g., "3", "4", "3.5"
-    variant: Optional[str] = None  # E.g., "mini", "pro", "turbo"
-    deployment_id: Optional[str] = None  # could be a date or number or string to identify the deployment in the same version + variant
-    tools: List[Tool] = None  # Supported tools
-    context_window: Optional[str] = None  # Context window size
-    output_tokens: Optional[str] = None  # Number of output tokens
-    hosted_cloud: Optional[str] = None  # Hosted cloud
-    token_rate_limit: Optional[int] = None  # Rate limit in tokens
-    api_rate_limit: Optional[int] = None  # API call rate limit
-    rate_limit_in_seconds: Optional[int] = None  # Time period for rate limit
-    release_date: Optional[str] = None  # Release date
-    knowledge_cutoff_date: Optional[str] = None  # Knowledge cutoff date
-    knowledge_source: Optional[str] = None # Knowledge source
-    description: Optional[str] = None  # Description
-    comments: Optional[str] = None  # Additional comments
-    quantization: Optional[str] = None  # Quantization level
-    model_region: Optional[str] = None  # Region where the model is hosted
-    model_city: Optional[str] = None  # City where the model is hosted
-    documentation_url: Optional[str] = None  # Link to documentation
-    pricing: Optional[Dict[str, Any]] = None  # Pricing information
-    core_languages: Optional[List[str]] = None  # Core languages supported
-    supported_languages: Optional[List[str]] = None # All other languages supported to certain extent
-    is_json_mode_enabled: Optional[bool] = None  # JSON mode (output json) enabled
-    is_serverless: Optional[bool] = None  # Serverless model
-    is_load_balanced: Optional[bool] = None  # Load-balanced endpoint for LLM and not a direct LLM model
-    is_base_model: Optional[bool] = False  # Base model or Instruction Tuned model
-    is_fine_tuned: Optional[bool] = False  # Fine-tuned model
-    is_content_filtering_enabled: Optional[bool] = False  # Content filtering enabled such as harmful, inappropriate, etc.
-    llm_metadata: Optional[Dict[str, Any]] = None  # Additional metadata
-    id: Optional[str] = None  # Unique identifier
+    input_capabilities: list[InputCapability] = None  # What inputs it can process
+    output_capabilities: list[OutputCapability] = None  # What outputs it can generate
+    capabilities: list[ModelCapability] = None  # Special capabilities
+    parameters: str | None = None  # E.g., "7b", "70b"
+    version: str | None = None  # E.g., "3", "4", "3.5"
+    variant: str | None = None  # E.g., "mini", "pro", "turbo"
+    deployment_id: str | None = None  # could be a date or number or string to identify the deployment in the same version + variant
+    tools: list[Tool] = None  # Supported tools
+    context_window: str | None = None  # Context window size
+    output_tokens: str | None = None  # Number of output tokens
+    hosted_cloud: str | None = None  # Hosted cloud
+    token_rate_limit: int | None = None  # Rate limit in tokens
+    api_rate_limit: int | None = None  # API call rate limit
+    rate_limit_in_seconds: int | None = None  # Time period for rate limit
+    release_date: str | None = None  # Release date
+    knowledge_cutoff_date: str | None = None  # Knowledge cutoff date
+    knowledge_source: str | None = None # Knowledge source
+    description: str | None = None  # Description
+    comments: str | None = None  # Additional comments
+    quantization: str | None = None  # Quantization level
+    model_region: str | None = None  # Region where the model is hosted
+    model_city: str | None = None  # City where the model is hosted
+    documentation_url: str | None = None  # Link to documentation
+    pricing: dict[str, Any] | None = None  # Pricing information
+    core_languages: list[str] | None = None  # Core languages supported
+    supported_languages: list[str] | None = None # All other languages supported to certain extent
+    is_json_mode_enabled: bool | None = None  # JSON mode (output json) enabled
+    is_serverless: bool | None = None  # Serverless model
+    is_load_balanced: bool | None = None  # Load-balanced endpoint for LLM and not a direct LLM model
+    is_base_model: bool | None = False  # Base model or Instruction Tuned model
+    is_fine_tuned: bool | None = False  # Fine-tuned model
+    is_content_filtering_enabled: bool | None = False  # Content filtering enabled such as harmful, inappropriate, etc.
+    llm_metadata: dict[str, Any] | None = None  # Additional metadata
+    id: str | None = None  # Unique identifier
 
     def __post_init__(self):
         """Initialize default values for lists"""
@@ -353,17 +363,17 @@ MODELS = {
 }
 logger.info(f"Models: {MODELS}")
 
-def get_model_ids() -> List[str]:
+def get_model_ids() -> list[str]:
     """Get all model IDs"""
     return list(MODELS.keys())
 
-def get_models() -> List[Dict]:
+def get_models() -> list[dict]:
     """Get all models"""
     return [
         {model.id: model.display_name} for model in MODELS.values()
     ]
 
-def get_model(model_id: str) -> Optional[LLMModel]:
+def get_model(model_id: str) -> LLMModel | None:
     """Get model by its ID"""
     return MODELS.get(model_id)
 
@@ -373,21 +383,21 @@ def get_default_model() -> LLMModel:
     return MODELS.get(azure_openai_gpt_4o_lb_v1.id, openai_gpt_4o_v1)
 
 
-def filter_models_by_capability(capability: ModelCapability) -> List[LLMModel]:
+def filter_models_by_capability(capability: ModelCapability) -> list[LLMModel]:
     """Get all models with a specific capability"""
     return [model for model in MODELS.values() if capability in model.capabilities]
 
 
-def filter_models_by_input(input_type: InputCapability) -> List[LLMModel]:
+def filter_models_by_input(input_type: InputCapability) -> list[LLMModel]:
     """Get all models that support a specific input type"""
     return [model for model in MODELS.values() if input_type in model.input_capabilities]
 
 
-def filter_models_by_output(output_type: OutputCapability) -> List[LLMModel]:
+def filter_models_by_output(output_type: OutputCapability) -> list[LLMModel]:
     """Get all models that support a specific output type"""
     return [model for model in MODELS.values() if output_type in model.output_capabilities]
 
 
-def filter_models_by_tool(tool: Tool) -> List[LLMModel]:
+def filter_models_by_tool(tool: Tool) -> list[LLMModel]:
     """Get all models that support a specific tool"""
     return [model for model in MODELS.values() if tool in model.tools]

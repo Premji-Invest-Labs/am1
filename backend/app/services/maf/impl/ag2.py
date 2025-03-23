@@ -1,14 +1,13 @@
-import logging
 import os
 
+from autogen import AssistantAgent, ChatResult, LLMConfig, UserProxyAgent
+from autogen.agents.experimental import DeepResearchAgent
 from dotenv import load_dotenv
 
 from app.core.enums import TaskStatus
 from app.core.logging import get_logger
 from app.schemas.task import AgenticTaskRequest, TaskResponse
 from app.services.maf.maf import MultiAgentFramework
-from autogen import AssistantAgent, UserProxyAgent, LLMConfig, ChatResult
-from autogen.agents.experimental import DeepResearchAgent
 
 load_dotenv()
 

@@ -1,9 +1,7 @@
 from datetime import datetime
-from typing import Dict, Type
 
-from fastapi import HTTPException, Depends
-from sqlalchemy import select, Boolean
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import HTTPException
+from sqlalchemy import select
 
 from app.core.logging import get_logger
 from app.db.database import get_db
@@ -15,7 +13,7 @@ class TaskRepository:
         # self.db: AsyncSession = get_db()
         self.logger = get_logger()
 
-    async def create(self, task: Task) -> Type[Task] | None:
+    async def create(self, task: Task) -> type[Task] | None:
         # self.db.add(task)
         # await self.db.commit()
         # await self.db.refresh(task)
@@ -31,7 +29,7 @@ class TaskRepository:
             self.logger.error(f"Error creating task: {e}")
             return None
 
-    async def get(self, task_id: str) -> Type[Task] | None:
+    async def get(self, task_id: str) -> type[Task] | None:
         # result = await self.db.execute(select(Task).filter(Task.task_id == task_id))
         # return result.scalars().first()
         # async for session in get_db():
@@ -40,16 +38,14 @@ class TaskRepository:
         #     return task
         async for session in get_db():
             # For SQLAlchemy 1.4+ with async sessions, use select instead of query
-            from sqlalchemy import select
 
             # Using select and execute for async sessions
             result = await session.execute(select(Task).filter(Task.task_id == task_id))
             task = result.scalars().first()
             return task
 
-    async def update(self, task_id: str, update_data: Dict) -> Type[Task] | None:
-        """
-        Generic function to update any field(s) in a task.
+    async def update(self, task_id: str, update_data: dict) -> type[Task] | None:
+        """Generic function to update any field(s) in a task.
 
         Args:
             task_id (str): The ID of the task to update.
@@ -57,6 +53,7 @@ class TaskRepository:
 
         Returns:
             TaskResponse: The updated task response.
+
         """
         try:
             self.logger.info(f"Updating task {task_id}. Update Data: {update_data}")
@@ -96,14 +93,14 @@ class TaskRepository:
             raise HTTPException(status_code=500, detail="Failed to update task")
 
     async def delete(self, task_id: str) -> bool | None:
-        """
-        Delete a task from the database.
+        """Delete a task from the database.
 
         Args:
             task_id (str): The ID of the task to delete.
 
         Returns:
             bool: True if task was deleted successfully.
+
         """
         try:
             async for session in get_db():
@@ -129,9 +126,8 @@ class TaskRepository:
             self.logger.error(f"Error deleting task {task_id}: {e}")
             raise HTTPException(status_code=500, detail="Failed to delete task")
 
-    async def get_all(self, offset: int = 0, limit: int = 10) -> list[Type[Task]]:
-        """
-        Get all tasks with pagination.
+    async def get_all(self, offset: int = 0, limit: int = 10) -> list[type[Task]]:
+        """Get all tasks with pagination.
 
         Args:
             offset (int): Number of records to skip.
@@ -139,6 +135,7 @@ class TaskRepository:
 
         Returns:
             list[Type[Task]]: List of task objects.
+
         """
         try:
             async for session in get_db():
