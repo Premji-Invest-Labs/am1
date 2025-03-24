@@ -3,7 +3,7 @@ import uuid
 import logging
 from datetime import datetime
 import aiokafka
-from app.models import Job
+from app.schemas.kafka import KafkaTaskRequest
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class KafkaProducer:
             await self.producer.stop()
             logger.info("Kafka producer stopped")
 
-    async def send_job(self, job: Job, topic: str):
+    async def send_job(self, job: KafkaTaskRequest, topic: str):
         if not self.producer:
             raise RuntimeError("Producer not started")
 
@@ -41,5 +41,5 @@ class KafkaProducer:
             key=job.id.encode("utf-8")
         )
 
-        logger.info(f"Job {job.id} sent to topic {topic}")
+        logger.info(f"Job {job.task_id} sent to topic {topic}")
         return job

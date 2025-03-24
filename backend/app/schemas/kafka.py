@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from backend.app.core.enums import TaskStatus
+from app.core.enums import TaskStatus
 
 
 class KafkaTaskRequest(BaseModel):

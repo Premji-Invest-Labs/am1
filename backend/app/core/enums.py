@@ -13,3 +13,6 @@ class TaskStatus(Enum):
     CREATED = "created"
     FAILED = "failed"
     PARTIAL_SUCCESS = "partial_success"
+
+def get_mas_framework_names():
+    return [e.value for e in MultiAgentFrameworks]
