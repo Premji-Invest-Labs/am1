@@ -1,0 +1,42 @@
+// .devcontainer/devcontainer.json
+{
+  "name": "Multi-Service Dev Environment",
+  // Reference your existing docker-compose.yml
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  // The service to which VS Code should "attach"
+  // for interactive dev and debugging:
+  "service": "backend",
+  // Ensure all services come up on "Reopen in Container"
+  "runServices": [
+    "backend",
+    "frontend",
+    "postgres"
+  ],
+  // Where VS Code should open the folder inside the container
+  "workspaceFolder": "/app",
+  // Forward common ports from your containers to the host
+  // so you can access them on localhost:<port>
+  "forwardPorts": [
+    8000,
+    // backend
+    3000
+    // frontend
+  ],
+  // VS Code container-level settings
+  "settings": {
+    // Example: use black for Python formatting
+    "python.formatting.provider": "black",
+    // Possibly point Python to the correct interpreter
+    "python.defaultInterpreterPath": "/usr/local/bin/python"
+  },
+  // Extensions you want installed in the backend container for dev
+  "extensions": [
+    "ms-python.python",
+    "ms-python.vscode-pylance"
+  ],
+  // Runs after the containers are built and started
+  // For instance, install backend dependencies:
+  "postCreateCommand": "pip install --no-cache-dir -r requirements.txt"
+}
