@@ -5,6 +5,7 @@ from pydantic import BaseModel, HttpUrl
 from app.core.enums import MultiAgentFrameworks
 from app.models.llm import get_default_model
 
+class MafIn
 
 class TaskRequest(BaseModel):
     task_id: str | None = None
@@ -12,6 +13,13 @@ class TaskRequest(BaseModel):
     multi_agent_framework: str | None = MultiAgentFrameworks.AM1.value
     llm_model: str | None = get_default_model().id
     enable_internet: bool | None = True
+    maf_instructions: MafInstructions | None = None
+    min_duration: int = 60 * 1 # in Seconds
+    max_duration: int = 60 * 30  # in Seconds
+    minimum_words: int = 1
+    maximum_words: int = 5000
+    max_replans: int = 0
+    email_output: bool = False
 
 
 class LiveStreamResponse(BaseModel):

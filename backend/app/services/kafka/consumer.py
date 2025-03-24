@@ -3,7 +3,7 @@ import asyncio
 import logging
 from datetime import datetime
 import aiokafka
-from app.models.kafka import KafkaTaskRequest
+from app.schemas.kafka import KafkaTaskRequest
 
 logger = logging.getLogger(__name__)
 
