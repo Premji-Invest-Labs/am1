@@ -21,7 +21,7 @@ async def upload_file_to_task(
     db: AsyncSession = Depends(get_db),
 ):
     """Upload file to an existing task."""
-    return await task_service.upload_file_to_task(task_id, input_file, db)
+    return await task_service.upload_file_to_task(task_id, input_file)
 
 
 @router.post("/{task_id}/start", response_model=TaskResponse)
@@ -31,7 +31,7 @@ async def start_task(task_id: str, background_tasks: BackgroundTasks, db: AsyncS
 
 
 @router.get("/{task_id}", response_model=TaskResponse)
-async def read_task(task_id: str, db: AsyncSession = Depends(get_db)):
+async def read_task(task_id: str):
     """Retrieve details of a specific task."""
     return await task_service.get_task_details(task_id)
 

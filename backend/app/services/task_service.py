@@ -7,7 +7,7 @@ from sqlalchemy.future import select
 
 from app.core.enums import MultiAgentFrameworks, TaskStatus
 from app.core.logging import get_logger
-from app.main import producer, KAFKA_TOPIC
+# from app.main import producer, KAFKA_TOPIC
 from app.models.task import Task
 from app.repository.task_repository import TaskRepository
 from app.schemas.task import (
@@ -137,7 +137,7 @@ async def start_task(task_id: str, background_tasks: BackgroundTasks, db: AsyncS
         logger.info(f"Task with ID {task_id} found: {task}")
 
         background_tasks.add_task(execute_task, task, db)
-        await producer.send_job(job, KAFKA_TOPIC)
+        # await producer.send_job(job, KAFKA_TOPIC)
         # update_task_details(
         #     task_id=task_id, final_response=response, status=status, db=db
         # )
@@ -468,7 +468,7 @@ async def get_all_tasks(offset: int, limit: int, db: AsyncSession) -> list[TaskR
 #         raise HTTPException(status_code=500, detail="Failed to update task")
 
 
-async def update_task(task_id: str, update_data: dict):
+async def update_task(task_id: str, update_data: dict) -> TaskResponse:
     updated_task = await task_repository.update(task_id=task_id, update_data=update_data)
     task_response = TaskResponse(
         task_id=str(updated_task.task_id),
@@ -491,11 +491,14 @@ async def update_task(task_id: str, update_data: dict):
     logger.info(f"Updated task with ID {task_id} from database | {task_response}")
     return task_response
 
-async def upload_file_to_task(task_id: str, input_file: UploadFile, db: AsyncSession) -> TaskResponse:
+async def upload_file_to_task(task_id: str, input_file: UploadFile) -> TaskResponse:
     # return TaskResponse(task_id=task_id, input_file_names=[input_file.filename])
     # Fetch the task from the database
-    task = await get_task_details(task_id, db)
-    input_file_names = task.input_file_names + [input_file.filename] if task.input_file_names else [input_file.filename]
+    task_response: TaskResponse = await get_task_details(task_id)
+    if input_file.filename in task_response.input_file_names:
+        raise HTTPException(status_code=400, detail="File already uploaded to task")
+
+    input_file_names = task_response.input_file_names + [input_file.filename] if task_response.input_file_names else [input_file.filename]
 
     # Create a folder with name task_id and save the file
     folder_path = os.path.join("uploads", task_id)
@@ -505,25 +508,7 @@ async def upload_file_to_task(task_id: str, input_file: UploadFile, db: AsyncSes
     file_path = os.path.join(folder_path, input_file.filename)
     with open(file_path, "wb") as file:
         file.write(await input_file.read())
-        task = await update_task(task_id=task_id,
+        updated_task_response: TaskResponse = await update_task(task_id=task_id,
                                  update_data={"input_file_names": input_file_names})
-    task_response = TaskResponse(
-        task_id=task.task_id.__str__(),
-        status=task.status,
-        task_request=TaskRequest(
-            query=task.query,
-            multi_agent_framework=task.multi_agent_framework,
-            llm_model=task.llm_model,
-            enable_internet=task.enable_internet,
-        ),
-        task_output=TaskOutput(
-            final_response=task.final_response,
-            output_file_urls=None,
-        ),
-        input_file_names=task.input_file_names,
-        task_metadata=task.task_metadata,
-        created_at=task.created_at.isoformat() if task.created_at else None,
-        updated_at=task.updated_at.isoformat() if task.updated_at else None,
-    )
-    logger.info(f"Uploaded task with ID {task_id} successfully.")
-    return task_response
+        logger.info(f"Uploaded task with ID {task_id} successfully.")
+        return updated_task_response
