@@ -16,16 +16,16 @@ from app.services.kafka.producer import KafkaProducer
 # from app.db.database import get_db
 
 # Get Kafka connection details from environment variables
-KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
-KAFKA_TOPIC = "background_jobs"
+# KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+# KAFKA_TOPIC = "background_jobs"
 
-# Create Kafka producer and consumer
-producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)
-consumer = KafkaConsumer(
-    bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-    topic=KAFKA_TOPIC,
-    group_id="background_processor"
-)
+# # Create Kafka producer and consumer
+# producer = KafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)
+# consumer = KafkaConsumer(
+#     bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+#     topic=KAFKA_TOPIC,
+#     group_id="background_processor"
+# )
 
 # Get logger
 logger = get_logger()
@@ -47,18 +47,18 @@ async def startup_event():
         logger.info(f"Tables being created for {settings.DATABASE_URL}")
         print(f"Tables being created for {settings.DATABASE_URL}")
         await sessionmanager.create_all(connection)
-    await producer.start()
-    await consumer.start()
-    # Start consuming messages in a background task
-    asyncio.create_task(consumer.consume())
+    # await producer.start()
+    # await consumer.start()
+    ## Start consuming messages in a background task
+    # asyncio.create_task(consumer.consume())
     print("Database and tables created")
 
 
 @app.on_event("shutdown")
 async def shutdown():
     await sessionmanager.close()
-    await producer.stop()
-    await consumer.stop()
+    # await producer.stop()
+    # await consumer.stop()
 
 
 # Configure logging

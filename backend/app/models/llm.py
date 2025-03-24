@@ -6,6 +6,7 @@ from app.core.logging import get_logger
 
 logger = get_logger()
 
+
 class LLMProvider(Enum):
     """Companies providing LLM services"""
 
@@ -89,6 +90,7 @@ class Tool(Enum):
     KNOWLEDGE_GRAPH = auto()  # Knowledge graph integration
     EXTERNAL_MEMORY = auto()  # External memory storage
 
+
 class HostedCloud(Enum):
     """Hosted cloud for the model"""
 
@@ -99,6 +101,7 @@ class HostedCloud(Enum):
     LAPTOP = auto()
     OTHERS = auto()
 
+
 class ModelRegion(Enum):
     """Region where the model is hosted"""
 
@@ -106,6 +109,7 @@ class ModelRegion(Enum):
     EU = auto()
     ASIA = auto()
     OTHERS = auto()
+
 
 class ModelCity(Enum):
     """City where the model is hosted"""
@@ -136,6 +140,7 @@ class LLMModel:
     parameters: str | None = None  # E.g., "7b", "70b"
     version: str | None = None  # E.g., "3", "4", "3.5"
     variant: str | None = None  # E.g., "mini", "pro", "turbo"
+    variant_delimiter: str | None = None  # ':', '-', etc.
     deployment_id: str | None = None  # could be a date or number or string to identify the deployment in the same version + variant
     tools: list[Tool] = None  # Supported tools
     context_window: str | None = None  # Context window size
@@ -146,7 +151,7 @@ class LLMModel:
     rate_limit_in_seconds: int | None = None  # Time period for rate limit
     release_date: str | None = None  # Release date
     knowledge_cutoff_date: str | None = None  # Knowledge cutoff date
-    knowledge_source: str | None = None # Knowledge source
+    knowledge_source: str | None = None  # Knowledge source
     description: str | None = None  # Description
     comments: str | None = None  # Additional comments
     quantization: str | None = None  # Quantization level
@@ -155,7 +160,7 @@ class LLMModel:
     documentation_url: str | None = None  # Link to documentation
     pricing: dict[str, Any] | None = None  # Pricing information
     core_languages: list[str] | None = None  # Core languages supported
-    supported_languages: list[str] | None = None # All other languages supported to certain extent
+    supported_languages: list[str] | None = None  # All other languages supported to certain extent
     is_json_mode_enabled: bool | None = None  # JSON mode (output json) enabled
     is_serverless: bool | None = None  # Serverless model
     is_load_balanced: bool | None = None  # Load-balanced endpoint for LLM and not a direct LLM model
@@ -180,13 +185,15 @@ class LLMModel:
                        f"{'-' + self.provider.value if self.provider.value else ''}"
                        f"{'-' + self.family.value if self.family else ''}"
                        f"{'-' + self.version if self.version else ''}"
+                       f"{'-' if self.variant_delimiter is None else self.variant_delimiter}"
                        f"{'-' + self.variant if self.variant is not None else ''}"
                        f"{'-' + self.deployment_id if self.deployment_id else ''}"
                        f"{'-' + self.parameters if self.parameters else ''}"
                        f"{'-' + self.context_window if self.context_window else ''}"
                        f"{'-' + self.quantization if self.quantization else ''}"
                        f"{'-base' if self.is_base_model else '-instructed'}"
-                       f"{'-' + self.model_region if self.model_region else ''}").lower()
+                       f"{'-lb' if self.is_load_balanced else ''}"
+                       f"{'-' + self.model_region if self.model_region else ''}").lower().replace()
 
 
 openai_gpt_4o_v1 = LLMModel(
@@ -195,6 +202,7 @@ openai_gpt_4o_v1 = LLMModel(
     family=LLMFamily.GPT,
     version="4",
     variant="o",
+    variant_delimiter='',
     hosted_cloud="OpenAI_Infra",
     input_capabilities=[
         InputCapability.TEXT,
@@ -226,152 +234,193 @@ openai_gpt_4o_v1 = LLMModel(
 )
 
 azure_openai_gpt_4o_v1 = LLMModel(
-        display_name="Azure OpenAI GPT-4o",
-        provider=LLMProvider.OPENAI,
-        family=LLMFamily.GPT,
-        version="4",
-        variant="o",
-        input_capabilities=[
-            InputCapability.TEXT,
-            InputCapability.IMAGE,
-            InputCapability.CODE,
-            InputCapability.PDF,
-        ],
-        output_capabilities=[
-            OutputCapability.TEXT,
-            OutputCapability.CODE,
-            OutputCapability.CHART,
-        ],
-        capabilities=[
-            ModelCapability.FUNCTION_CALLING,
-            ModelCapability.TOOL_USE,
-            ModelCapability.MULTI_MODAL,
-            ModelCapability.REASONING,
-            ModelCapability.STREAMING,
-        ],
-        tools=[
-            Tool.CODE_INTERPRETER,
-            Tool.CALCULATOR,
-            Tool.FILE_READING,
-            Tool.PLUGIN_ECOSYSTEM,
-        ],
-        context_window="32k",
-        description="OpenAI's multimodal model capable of processing both text and images.",
-        documentation_url="https://platform.openai.com/docs/models/gpt-4o",
-    )
+    display_name="Azure OpenAI GPT-4o",
+    provider=LLMProvider.OPENAI,
+    family=LLMFamily.GPT,
+    version="4",
+    variant="o",
+    variant_delimiter='',
+    hosted_cloud=HostedCloud.AZURE.name.lower(),
+    input_capabilities=[
+        InputCapability.TEXT,
+        InputCapability.IMAGE,
+        InputCapability.CODE,
+        InputCapability.PDF,
+    ],
+    output_capabilities=[
+        OutputCapability.TEXT,
+        OutputCapability.CODE,
+        OutputCapability.CHART,
+    ],
+    capabilities=[
+        ModelCapability.FUNCTION_CALLING,
+        ModelCapability.TOOL_USE,
+        ModelCapability.MULTI_MODAL,
+        ModelCapability.REASONING,
+        ModelCapability.STREAMING,
+    ],
+    tools=[
+        Tool.CODE_INTERPRETER,
+        Tool.CALCULATOR,
+        Tool.FILE_READING,
+        Tool.PLUGIN_ECOSYSTEM,
+    ],
+    context_window="32k",
+    description="OpenAI's multimodal model capable of processing both text and images.",
+    documentation_url="https://platform.openai.com/docs/models/gpt-4o",
+)
 azure_openai_gpt_4o_lb_v1 = LLMModel(
-        display_name="Azure OpenAI GPT-4o-lb",
-        provider=LLMProvider.OPENAI,
-        family=LLMFamily.GPT,
-        version="4",
-        variant="o",
-        hosted_cloud=HostedCloud.AZURE.__str__().lower(),
-        input_capabilities=[
-            InputCapability.TEXT,
-            InputCapability.IMAGE,
-            InputCapability.CODE,
-            InputCapability.PDF,
-        ],
-        output_capabilities=[
-            OutputCapability.TEXT,
-            OutputCapability.CODE,
-            OutputCapability.CHART,
-        ],
-        capabilities=[
-            ModelCapability.FUNCTION_CALLING,
-            ModelCapability.TOOL_USE,
-            ModelCapability.MULTI_MODAL,
-            ModelCapability.REASONING,
-            ModelCapability.STREAMING,
-        ],
-        tools=[
-            Tool.CODE_INTERPRETER,
-            Tool.CALCULATOR,
-            Tool.FILE_READING,
-            Tool.PLUGIN_ECOSYSTEM,
-        ],
-        context_window="32k",
-        description="OpenAI's multimodal model capable of processing both text and images.",
-        documentation_url="https://platform.openai.com/docs/models/gpt-4o",
-    )
+    display_name="Azure OpenAI GPT-4o-lb",
+    provider=LLMProvider.OPENAI,
+    family=LLMFamily.GPT,
+    version="4",
+    variant="o",
+    variant_delimiter='',
+    hosted_cloud=HostedCloud.AZURE.name.lower(),
+    input_capabilities=[
+        InputCapability.TEXT,
+        InputCapability.IMAGE,
+        InputCapability.CODE,
+        InputCapability.PDF,
+    ],
+    output_capabilities=[
+        OutputCapability.TEXT,
+        OutputCapability.CODE,
+        OutputCapability.CHART,
+    ],
+    capabilities=[
+        ModelCapability.FUNCTION_CALLING,
+        ModelCapability.TOOL_USE,
+        ModelCapability.MULTI_MODAL,
+        ModelCapability.REASONING,
+        ModelCapability.STREAMING,
+    ],
+    tools=[
+        Tool.CODE_INTERPRETER,
+        Tool.CALCULATOR,
+        Tool.FILE_READING,
+        Tool.PLUGIN_ECOSYSTEM,
+    ],
+    context_window="32k",
+    is_load_balanced=True,
+    description="OpenAI's multimodal model capable of processing both text and images.",
+    documentation_url="https://platform.openai.com/docs/models/gpt-4o",
+)
 # "claude-3-opus": LLMModel(
-    #     id="claude-3-opus",
-    #     display_name="Claude 3 Opus",
-    #     provider=LLMProvider.ANTHROPIC,
-    #     family=LLMFamily.CLAUDE,
-    #     version="3",
-    #     variant="opus",
-    #     input_capabilities=[
-    #         InputCapability.TEXT,
-    #         InputCapability.IMAGE,
-    #         InputCapability.CODE,
-    #         InputCapability.PDF,
-    #     ],
-    #     output_capabilities=[
-    #         OutputCapability.TEXT,
-    #         OutputCapability.CODE,
-    #     ],
-    #     capabilities=[
-    #         ModelCapability.TOOL_USE,
-    #         ModelCapability.REASONING,
-    #         ModelCapability.MULTI_MODAL,
-    #         ModelCapability.STREAMING,
-    #     ],
-    #     tools=[
-    #         Tool.FILE_READING,
-    #     ],
-    #     context_window=200000,
-    #     description="Anthropic's most powerful model with advanced reasoning capabilities.",
-    #     documentation_url="https://docs.anthropic.com/claude/docs/models-overview",
-    # ),
+#     id="claude-3-opus",
+#     display_name="Claude 3 Opus",
+#     provider=LLMProvider.ANTHROPIC,
+#     family=LLMFamily.CLAUDE,
+#     version="3",
+#     variant="opus",
+#     input_capabilities=[
+#         InputCapability.TEXT,
+#         InputCapability.IMAGE,
+#         InputCapability.CODE,
+#         InputCapability.PDF,
+#     ],
+#     output_capabilities=[
+#         OutputCapability.TEXT,
+#         OutputCapability.CODE,
+#     ],
+#     capabilities=[
+#         ModelCapability.TOOL_USE,
+#         ModelCapability.REASONING,
+#         ModelCapability.MULTI_MODAL,
+#         ModelCapability.STREAMING,
+#     ],
+#     tools=[
+#         Tool.FILE_READING,
+#     ],
+#     context_window=200000,
+#     description="Anthropic's most powerful model with advanced reasoning capabilities.",
+#     documentation_url="https://docs.anthropic.com/claude/docs/models-overview",
+# ),
+llama3_2_vision_90b_instruct_v1 = LLMModel(
+    id="llama3.2-vision:90b-instruct",
+    display_name="LLAMA 3.2 Vision 90b Instruct",
+    provider=LLMProvider.META,
+    family=LLMFamily.LLAMA,
+    version="3",
+    variant="2",
+    variant_delimiter=':',
+    parameters="90b",
+    hosted_cloud=HostedCloud.AZURE.name.lower(),
+    input_capabilities=[
+        InputCapability.TEXT,
+        InputCapability.IMAGE,
+    ],
+    output_capabilities=[
+        OutputCapability.TEXT,
+    ],
+    capabilities=[
+        ModelCapability.VISION,
+        ModelCapability.MULTI_MODAL,
+        ModelCapability.STREAMING,
+    ],
+    tools=[
+        Tool.DALL_E,
+        Tool.VISION,
+    ],
+    context_window="128k",
+    is_base_model=False,
+    description="LLama 3.2 Vision model with 90 billion parameters for image processing.",
+    documentation_url="https://www.llama.com/docs/get-started/",
+)
 llama3_2_vision_11b_instruct_q4_K_M_v1 = LLMModel(
-        id="llama3.2-vision:11b-instruct-q4_K_M",
-        display_name="LLAMA 3.2 Vision 11b Instruct Q4_K_M",
-        provider=LLMProvider.META,
-        family=LLMFamily.LLAMA,
-        version="3",
-        variant="2",
-        parameters="11b",
-        quantization="q4_K_M",
-        input_capabilities=[
-            InputCapability.TEXT,
-            InputCapability.IMAGE,
-        ],
-        output_capabilities=[
-            OutputCapability.TEXT,
-        ],
-        capabilities=[
-            ModelCapability.VISION,
-            ModelCapability.MULTI_MODAL,
-            ModelCapability.STREAMING,
-        ],
-        tools=[
-            Tool.DALL_E,
-            Tool.VISION,
-        ],
-        context_window="128k",
-        is_base_model=False,
-        description="LLama 3.2 Vision model with 11 billion parameters for image processing.",
-        documentation_url="https://www.llama.com/docs/get-started/",
-    )
+    id="llama3.2-vision:11b-instruct-q4_K_M",
+    display_name="LLAMA 3.2 Vision 11b Instruct Q4_K_M",
+    provider=LLMProvider.META,
+    family=LLMFamily.LLAMA,
+    version="3",
+    variant="2",
+    variant_delimiter=':',
+    parameters="11b",
+    quantization="q4_K_M",
+    hosted_cloud=HostedCloud.LAPTOP.name.lower(),
+    input_capabilities=[
+        InputCapability.TEXT,
+        InputCapability.IMAGE,
+    ],
+    output_capabilities=[
+        OutputCapability.TEXT,
+    ],
+    capabilities=[
+        ModelCapability.VISION,
+        ModelCapability.MULTI_MODAL,
+        ModelCapability.STREAMING,
+    ],
+    tools=[
+        Tool.DALL_E,
+        Tool.VISION,
+    ],
+    context_window="128k",
+    is_base_model=False,
+    description="LLama 3.2 Vision model with 11 billion parameters for image processing.",
+    documentation_url="https://www.llama.com/docs/get-started/",
+)
 
 MODELS = {
     openai_gpt_4o_v1.id: openai_gpt_4o_v1,
     azure_openai_gpt_4o_lb_v1.id: azure_openai_gpt_4o_lb_v1,
     azure_openai_gpt_4o_v1.id: azure_openai_gpt_4o_v1,
-    llama3_2_vision_11b_instruct_q4_K_M_v1.id: llama3_2_vision_11b_instruct_q4_K_M_v1
+    llama3_2_vision_11b_instruct_q4_K_M_v1.id: llama3_2_vision_11b_instruct_q4_K_M_v1,
+    llama3_2_vision_90b_instruct_v1.id: llama3_2_vision_90b_instruct_v1
 }
 logger.info(f"Models: {MODELS}")
+
 
 def get_model_ids() -> list[str]:
     """Get all model IDs"""
     return list(MODELS.keys())
+
 
 def get_models() -> list[dict]:
     """Get all models"""
     return [
         {model.id: model.display_name} for model in MODELS.values()
     ]
+
 
 def get_model(model_id: str) -> LLMModel | None:
     """Get model by its ID"""
