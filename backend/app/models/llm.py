@@ -130,8 +130,6 @@ class ModelCity(Enum):
 @dataclass
 class LLMModel:
     """Comprehensive model representation"""
-
-    display_name: str  # Human-readable name
     provider: LLMProvider  # Provider company
     family: LLMFamily  # Model family
     input_capabilities: list[InputCapability] = None  # What inputs it can process
@@ -169,6 +167,7 @@ class LLMModel:
     is_content_filtering_enabled: bool | None = False  # Content filtering enabled such as harmful, inappropriate, etc.
     llm_metadata: dict[str, Any] | None = None  # Additional metadata
     id: str | None = None  # Unique identifier
+    display_name: str | None = None  # Human-readable name
 
     def __post_init__(self):
         """Initialize default values for lists"""
@@ -181,23 +180,27 @@ class LLMModel:
         if self.tools is None:
             self.tools = []
         if not self.id:
-            self.id = (f"{self.hosted_cloud + '-' if self.hosted_cloud else ''}"
+            self.id = (((f"{self.hosted_cloud + '-' if self.hosted_cloud else ''}"
                        f"{'-' + self.provider.value if self.provider.value else ''}"
                        f"{'-' + self.family.value if self.family else ''}"
                        f"{'-' + self.version if self.version else ''}"
                        f"{'-' if self.variant_delimiter is None else self.variant_delimiter}"
-                       f"{'-' + self.variant if self.variant is not None else ''}"
+                       f"{self.variant if self.variant is not None else ''}"
                        f"{'-' + self.deployment_id if self.deployment_id else ''}"
                        f"{'-' + self.parameters if self.parameters else ''}"
                        f"{'-' + self.context_window if self.context_window else ''}"
                        f"{'-' + self.quantization if self.quantization else ''}"
                        f"{'-base' if self.is_base_model else '-instructed'}"
                        f"{'-lb' if self.is_load_balanced else ''}"
-                       f"{'-' + self.model_region if self.model_region else ''}").lower().replace()
+                       f"{'-' + self.model_region if self.model_region else ''}").lower()
+                       .replace("hostedcloud.", "")).replace("--", "-")
+                       .replace(" ", "_"))
+        if not self.display_name:
+            self.display_name = self.id.replace("_", " ").title()
 
 
 openai_gpt_4o_v1 = LLMModel(
-    display_name="OpenAI GPT-4o",
+    # display_name="OpenAI GPT-4o",
     provider=LLMProvider.OPENAI,
     family=LLMFamily.GPT,
     version="4",
@@ -234,7 +237,7 @@ openai_gpt_4o_v1 = LLMModel(
 )
 
 azure_openai_gpt_4o_v1 = LLMModel(
-    display_name="Azure OpenAI GPT-4o",
+    # display_name="Azure OpenAI GPT-4o",
     provider=LLMProvider.OPENAI,
     family=LLMFamily.GPT,
     version="4",
@@ -270,7 +273,7 @@ azure_openai_gpt_4o_v1 = LLMModel(
     documentation_url="https://platform.openai.com/docs/models/gpt-4o",
 )
 azure_openai_gpt_4o_lb_v1 = LLMModel(
-    display_name="Azure OpenAI GPT-4o-lb",
+    # display_name="Azure OpenAI GPT-4o-lb",
     provider=LLMProvider.OPENAI,
     family=LLMFamily.GPT,
     version="4",
@@ -337,8 +340,8 @@ azure_openai_gpt_4o_lb_v1 = LLMModel(
 #     documentation_url="https://docs.anthropic.com/claude/docs/models-overview",
 # ),
 llama3_2_vision_90b_instruct_v1 = LLMModel(
-    id="llama3.2-vision:90b-instruct",
-    display_name="LLAMA 3.2 Vision 90b Instruct",
+    # id="llama3.2-vision:90b-instruct",
+    # display_name="LLAMA 3.2 Vision 90b Instruct",
     provider=LLMProvider.META,
     family=LLMFamily.LLAMA,
     version="3",
@@ -368,8 +371,8 @@ llama3_2_vision_90b_instruct_v1 = LLMModel(
     documentation_url="https://www.llama.com/docs/get-started/",
 )
 llama3_2_vision_11b_instruct_q4_K_M_v1 = LLMModel(
-    id="llama3.2-vision:11b-instruct-q4_K_M",
-    display_name="LLAMA 3.2 Vision 11b Instruct Q4_K_M",
+    # id="llama3.2-vision:11b-instruct-q4_K_M",
+    # display_name="LLAMA 3.2 Vision 11b Instruct Q4_K_M",
     provider=LLMProvider.META,
     family=LLMFamily.LLAMA,
     version="3",
