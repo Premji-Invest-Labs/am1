@@ -1,17 +1,13 @@
-import asyncio
 import logging
-import os
 
 from fastapi import FastAPI
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 
-from app.api.v1.endpoints import health, task
+from app.api.v1.endpoints import health, task, web_task
 from app.core.logging import get_logger
 from app.core.settings import settings
 from app.db.database import sessionmanager
-from app.services.kafka.consumer import KafkaConsumer
-from app.services.kafka.producer import KafkaProducer
 
 # from app.db.database import get_db
 
@@ -91,6 +87,7 @@ app.add_middleware(
 
 # Include API routers
 app.include_router(task.router)
+app.include_router(web_task.router)
 app.include_router(health.router)
 
 
