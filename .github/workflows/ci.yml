@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  trufflehog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run TruffleHog OSS
+        uses: trufflesecurity/trufflehog@v3.88.18
+        with:
+          scanArguments: >
+            --only-verified
+            --json
+            --fail
+            --exclude-paths .github/trufflehog-exclude.txt
